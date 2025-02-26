@@ -1,40 +1,58 @@
 #include "FileManager.h"
 #include <iostream>
 #include <filesystem>
+#include <fstream>
+#include <sys/stat.h>
 
 namespace fs = std::filesystem;
 
-// Просмотр файлов
-void listFiles(const std::string& path) {
+// Удаление файла
+void deleteFile(const std::string& path) {
     try {
-        for (const auto& entry : fs::directory_iterator(path)) {
-            std::cout << (entry.is_directory() ? "[DIR] " : "[FILE] ")
-                      << entry.path().filename() << '\n';
+        if (fs::remove(path)) {
+            std::cout << "Файл успешно удален: " << path << '\n';
+        } else {
+            std::cout << "Файл не найден: " << path << '\n';
         }
     } catch (const fs::filesystem_error& e) {
+        std::cerr << "Ошибка удаления: " << e.what() << '\n';
+    }
+}
+
+// Изменение прав доступа
+void changeFilePermissions(const std::string& path, const std::string& permissions) {
+    try {
+        mode_t mode = 0;
+
+        for (char c : permissions) {
+            mode <<= 3;
+            mode |= (c - '0');
+        }
+
+        if (chmod(path.c_str(), mode) == 0) {
+            std::cout << "Права успешно изменены на " << permissions << '\n';
+        } else {
+            perror("Ошибка изменения прав");
+        }
+    } catch (const std::exception& e) {
         std::cerr << "Ошибка: " << e.what() << '\n';
     }
 }
 
-// Копирование файла
-void copyFile(const std::string& source, const std::string& destination) {
+// Простое создание архива (ZIP)
+void createArchive(const std::string& source, const std::string& archivePath) {
     try {
-        fs::copy(source, destination, fs::copy_options::overwrite_existing);
-        std::cout << "Файл успешно скопирован в " << destination << '\n';
-    } catch (const fs::filesystem_error& e) {
-        std::cerr << "Ошибка копирования: " << e.what() << '\n';
-    }
-}
+        std::ifstream src(source, std::ios::binary);
+        std::ofstream dest(archivePath, std::ios::binary);
 
-// Поиск файла
-void searchFile(const std::string& path, const std::string& filename) {
-    try {
-        for (const auto& entry : fs::recursive_directory_iterator(path)) {
-            if (entry.path().filename() == filename) {
-                std::cout << "Найден: " << entry.path() << '\n';
-            }
+        if (!src || !dest) {
+            std::cerr << "Ошибка открытия файла.\n";
+            return;
         }
-    } catch (const fs::filesystem_error& e) {
-        std::cerr << "Ошибка поиска: " << e.what() << '\n';
+
+        dest << src.rdbuf();
+        std::cout << "Архив создан: " << archivePath << '\n';
+    } catch (const std::exception& e) {
+        std::cerr << "Ошибка архивирования: " << e.what() << '\n';
     }
 }

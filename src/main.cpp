@@ -3,14 +3,17 @@
 
 int main() {
     int choice;
-    std::string path, source, destination, filename;
+    std::string path, source, destination, filename, permissions;
 
     while (true) {
         std::cout << "\n===== Меню =====\n"
                   << "1. Просмотр файлов\n"
                   << "2. Копирование файла\n"
                   << "3. Поиск файла\n"
-                  << "4. Выход\n"
+                  << "4. Удаление файла\n"
+                  << "5. Изменение прав доступа\n"
+                  << "6. Создание архива\n"
+                  << "7. Выход\n"
                   << "Выберите действие: ";
         std::cin >> choice;
 
@@ -38,6 +41,28 @@ int main() {
                 break;
 
             case 4:
+                std::cout << "Введите путь к файлу для удаления: ";
+                std::cin >> path;
+                deleteFile(path);
+                break;
+
+            case 5:
+                std::cout << "Введите путь к файлу: ";
+                std::cin >> path;
+                std::cout << "Введите права доступа (например, 755): ";
+                std::cin >> permissions;
+                changeFilePermissions(path, permissions);
+                break;
+
+            case 6:
+                std::cout << "Введите путь к файлу для архивации: ";
+                std::cin >> source;
+                std::cout << "Введите путь к архиву (например, archive.zip): ";
+                std::cin >> destination;
+                createArchive(source, destination);
+                break;
+
+            case 7:
                 std::cout << "Выход...\n";
                 return 0;
 
