@@ -1,25 +1,48 @@
 #include <iostream>
-#include <filesystem>
-
-namespace fs = std::filesystem;
-
-void listFiles(const std::string& path) {
-    try {
-        for (const auto& entry : fs::directory_iterator(path)) {
-            std::cout << (entry.is_directory() ? "[DIR] " : "[FILE] ") 
-                      << entry.path().filename() << '\n';
-        }
-    } catch (const fs::filesystem_error& e) {
-        std::cerr << "Ошибка: " << e.what() << '\n';
-    }
-}
+#include "FileManager.h"
 
 int main() {
-    std::string path;
-    std::cout << "Введите путь к директории: ";
-    std::cin >> path;
+    int choice;
+    std::string path, source, destination, filename;
 
-    listFiles(path);
+    while (true) {
+        std::cout << "\n===== Меню =====\n"
+                  << "1. Просмотр файлов\n"
+                  << "2. Копирование файла\n"
+                  << "3. Поиск файла\n"
+                  << "4. Выход\n"
+                  << "Выберите действие: ";
+        std::cin >> choice;
 
-    return 0;
+        switch (choice) {
+            case 1:
+                std::cout << "Введите путь к папке: ";
+                std::cin >> path;
+                listFiles(path);
+                break;
+
+            case 2:
+                std::cout << "Введите путь к исходному файлу: ";
+                std::cin >> source;
+                std::cout << "Введите путь назначения: ";
+                std::cin >> destination;
+                copyFile(source, destination);
+                break;
+
+            case 3:
+                std::cout << "Введите путь для поиска: ";
+                std::cin >> path;
+                std::cout << "Введите имя файла: ";
+                std::cin >> filename;
+                searchFile(path, filename);
+                break;
+
+            case 4:
+                std::cout << "Выход...\n";
+                return 0;
+
+            default:
+                std::cout << "Неверный выбор. Попробуйте снова.\n";
+        }
+    }
 }
