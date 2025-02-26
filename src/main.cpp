@@ -66,6 +66,15 @@ int main() {
                 std::cout << "Выход...\n";
                 return 0;
 
+            case 8:
+                std::cout << "Введите путь к исходному файлу для многопоточного копирования: ";
+                std::cin >> source;
+                std::cout << "Введите путь назначения: ";
+                std::cin >> destination;
+                copyFileMultithreaded(source, destination);
+                break;
+            
+
             default:
                 std::cout << "Неверный выбор. Попробуйте снова.\n";
         }
